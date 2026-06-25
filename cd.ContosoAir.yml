@@ -23,7 +23,7 @@ steps:
   inputs:
     buildType: 'specific'
     project: 'ae139a40-656c-4fc7-a24d-e6daf109b703'
-    definition: '149'
+    definition: '3'
     specificBuildWithTriggering: true
     buildVersionToDownload: 'latest'
     targetPath: '$(Pipeline.Workspace)'
