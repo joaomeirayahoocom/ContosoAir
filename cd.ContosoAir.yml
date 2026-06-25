@@ -18,7 +18,6 @@ resources:
 pool:
   vmImage: ubuntu-latest
 
-
 steps:
 - task: DownloadPipelineArtifact@2
   inputs:
