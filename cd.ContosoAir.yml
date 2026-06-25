@@ -8,7 +8,44 @@ trigger:
 
 resources:
   pipelines:
-    -  pipeline: buildContosoAir # identifier for the resource used in pipeline
-       source: [username].ContosoAir # name of the pipeline that produces the artifact 
+    - pipeline: buildContosoAir # identifier for the resource used in pipeline
+      source: [username].ContosoAir # name of the pipeline that produces the artifact 
+      trigger:
+        branches:
+         include:
+           - master
 
+pool:
+  vmImage: unbuntu-latest
 
+steps:
+- task: DownloadPipelineArtifact@2
+  inputs:
+    buildType: 'specific'
+    project: 'ae139a40-656c-4fc7-a24d-e6daf109b703'
+    definition: '149'
+    specificBuildWithTriggering: true
+    buildVersionToDownload: 'latest'
+    targetPath: '$(Pipeline.Workspace)'
+
+- task: AzureResourceManagerTemplateDeployment@3
+  inputs:
+    deploymentScope: 'Resource Group'
+    azureResourceManagerConnection: 'AzureConnection'
+    subscriptionId: '086e7bea-9a5e-40f0-9495-7d00486c88b2'
+    action: 'Create Or Update Resource Group'
+    resourceGroupName: 'Default-ActivityLogAlerts'
+    location: 'West US 3'
+    templateLocation: 'Linked artifact'
+    csmFile: '$(Pipeline.Workspace)/drop/Templates/azuredeploy.json'
+    csmParametersFile: '$(Pipeline.Workspace)/drop/Templates/azuredeploy.parameters.json'
+    overrideParameters: '-p_environment $(web_environment) -p_site_prefix $(web_prefix) -p_site_web_name $(web_site)'
+    deploymentMode: 'Incremental'
+
+- task: AzureRmWebAppDeployment@5
+  inputs:
+    ConnectionType: 'AzureRM'
+    azureSubscription: 'AzureConnection'
+    appType: 'webApp'
+    WebAppName: '$(web_prefix)-$(web_site)-$(web_environment)'
+    packageForLinux: '$(Pipeline.Workspace)/*/.zip'
