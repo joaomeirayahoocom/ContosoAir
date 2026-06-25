@@ -8,15 +8,16 @@ trigger:
 
 resources:
   pipelines:
-    - pipeline: buildContosoAir # identifier for the resource used in pipeline
-      source: [username].ContosoAir # name of the pipeline that produces the artifact 
+    - pipeline: buildContosoAir          # alias used inside this pipeline
+      source: joaomeirayahoocom.ContosoAir           # exact name of the build pipeline
       trigger:
         branches:
-         include:
-           - master
+          include:
+            - master
 
 pool:
-  vmImage: unbuntu-latest
+  vmImage: ubuntu-latest
+
 
 steps:
 - task: DownloadPipelineArtifact@2
